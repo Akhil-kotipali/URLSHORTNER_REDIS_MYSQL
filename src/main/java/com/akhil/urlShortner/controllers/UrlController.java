@@ -9,8 +9,11 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import com.akhil.urlShortner.dto.CreateUrlResponse;
+import com.akhil.urlShortner.dto.UrlRequest;
 import com.akhil.urlShortner.models.Url;
 import com.akhil.urlShortner.services.UrlService;
+
+import jakarta.validation.Valid;
 
 @RestController
 public class UrlController {
@@ -22,20 +25,20 @@ public class UrlController {
         this.urlService = urlService;
     }
 
-    @PostMapping("/api/urls")
-    public ResponseEntity<CreateUrlResponse> createShortUrl(@RequestBody Url url) {
-        
-        CreateUrlResponse response = urlService.createShortUrl(url);
+  @PostMapping("/api/urls")
+    public ResponseEntity<CreateUrlResponse> createShortUrl(@RequestBody @Valid UrlRequest request) {
+   
+    Url url = new Url();
+    url.setLongUrl(request.getLongUrl());
+    
+    CreateUrlResponse response = urlService.createShortUrl(url);
 
-        return ResponseEntity
-                .status(201)
-                .body(response);
+    return ResponseEntity.status(201).body(response);
     }
 
     @GetMapping("/{code}")
     public ResponseEntity<Void> redirectToLongUrl(@PathVariable String code) {
         
-        // The service handles fetching and throwing the exception if not found
         String longUrl = urlService.getLongUrl(code);
         
         return ResponseEntity

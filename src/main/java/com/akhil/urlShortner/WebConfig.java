@@ -17,6 +17,6 @@ public class WebConfig implements WebMvcConfigurer {
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
         // Only guard the URL shortening API
-        registry.addInterceptor(interceptor).addPathPatterns("/api/urls/**","/**"); 
+        registry.addInterceptor(interceptor).addPathPatterns("/api/urls", "/create-custom");
     }
 }
