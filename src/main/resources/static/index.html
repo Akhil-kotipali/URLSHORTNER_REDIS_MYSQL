@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JTRACE Shortener</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 text-gray-900 font-sans">
+
+    <nav class="bg-blue-600 p-4 text-white flex justify-between items-center shadow-lg">
+        <h1 class="text-xl font-bold tracking-wider">URL Shortener Pro</h1>
+        <button id="logoutBtn" class="hidden bg-red-500 px-4 py-2 rounded hover:bg-red-700 transition" onclick="logout()">Logout</button>
+    </nav>
+
+    <div class="container mx-auto mt-10 p-4 max-w-4xl">
+
+        <div id="authSection" class="bg-white p-8 rounded shadow-md max-w-md mx-auto">
+            <h2 class="text-2xl mb-4 font-bold text-center">Login / Register</h2>
+            <input type="text" id="username" placeholder="Username" class="w-full border p-2 mb-4 rounded">
+            <input type="password" id="password" placeholder="Password" class="w-full border p-2 mb-4 rounded">
+            <div class="flex justify-between">
+                <button onclick="authenticate('login')" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">Login</button>
+                <button onclick="authenticate('register')" class="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600">Register</button>
+            </div>
+            <p id="authMessage" class="text-red-500 mt-4 text-center"></p>
+        </div>
+
+        <div id="userDashboard" class="hidden bg-white p-8 rounded shadow-md">
+            <h2 class="text-2xl mb-6 font-bold">My Links</h2>
+            <div class="flex gap-4 mb-6">
+                <input type="url" id="longUrlInput" placeholder="Enter long URL (https://...)" class="flex-1 border p-2 rounded">
+                <button onclick="createShortLink()" class="bg-blue-600 text-white px-6 py-2 rounded shadow hover:bg-blue-700">Shorten</button>
+            </div>
+            <p id="linkResult" class="text-green-600 font-bold mb-4"></p>
+            <div class="p-4 bg-gray-50 rounded border text-gray-600 text-center">Links will appear here</div>
+        </div>
+
+        <div id="adminDashboard" class="hidden mt-8">
+            <h2 class="text-2xl mb-4 font-bold">Admin System Monitor</h2>
+            <div class="grid grid-cols-2 gap-4 mb-8">
+                <div class="bg-white p-6 rounded shadow-md border-l-4 border-blue-500">
+                    <h3 class="text-gray-500 uppercase text-sm font-bold">App Status</h3>
+                    <p id="healthStatus" class="text-2xl font-bold text-blue-600 mt-2">Loading...</p>
+                </div>
+                <div class="bg-white p-6 rounded shadow-md border-l-4 border-purple-500">
+                    <h3 class="text-gray-500 uppercase text-sm font-bold">Memory Usage</h3>
+                    <p id="memoryStatus" class="text-2xl font-bold text-purple-600 mt-2">Loading...</p>
+                </div>
+            </div>
+
+            <div class="bg-gray-900 text-green-400 p-4 rounded shadow-md font-mono text-sm h-64 overflow-y-auto">
+                <h3 class="text-white mb-2 font-bold sticky top-0 bg-gray-900 pb-2">Live Logs (Last 50 lines)</h3>
+                <pre id="logOutput">Fetching logs...</pre>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const baseUrl = "http://localhost:8080";
+        let pollInterval;
+
+        // Check if already logged in on page load
+        window.onload = () => {
+            const token = localStorage.getItem('jwt');
+            const role = localStorage.getItem('role');
+            if (token) showDashboard(role);
+        };
+
+        async function authenticate(action) {
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            
+            const res = await fetch(`${baseUrl}/api/auth/${action}`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ username, password })
+            });
+
+            const data = await res.json();
+            if (res.ok) {
+                if (action === 'login') {
+                    localStorage.setItem('jwt', data.token);
+                    localStorage.setItem('role', data.role);
+                    showDashboard(data.role);
+                } else {
+                    document.getElementById('authMessage').innerText = "Registered! You can now login.";
+                    document.getElementById('authMessage').className = "text-green-500 mt-4 text-center";
+                }
+            } else {
+                document.getElementById('authMessage').innerText = data.error || "Authentication failed";
+            }
+        }
+
+        function showDashboard(role) {
+            document.getElementById('authSection').classList.add('hidden');
+            document.getElementById('logoutBtn').classList.remove('hidden');
+            document.getElementById('userDashboard').classList.remove('hidden');
+
+            if (role === 'ROLE_ADMIN') {
+                document.getElementById('adminDashboard').classList.remove('hidden');
+                startAdminPolling();
+            }
+        }
+
+        function logout() {
+            localStorage.clear();
+            clearInterval(pollInterval);
+            location.reload();
+        }
+
+        async function createShortLink() {
+            const longUrl = document.getElementById('longUrlInput').value;
+            const token = localStorage.getItem('jwt');
+
+            const res = await fetch(`${baseUrl}/api/urls`, {
+                method: 'POST',
+                headers: { 
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify({ longUrl })
+            });
+
+            if(res.ok) {
+                const data = await res.json();
+                document.getElementById('linkResult').innerHTML = `Short URL: <a href="${data.shortUrl}" target="_blank" class="underline text-blue-500">${data.shortUrl}</a>`;
+            }
+        }
+
+        // Admin Actuator Polling
+        function startAdminPolling() {
+            fetchAdminData(); // fetch immediately
+            pollInterval = setInterval(fetchAdminData, 10000); // then every 10s
+        }
+
+        async function fetchAdminData() {
+            const token = localStorage.getItem('jwt');
+            const headers = { 'Authorization': `Bearer ${token}` };
+
+            // Fetch Health
+            fetch(`${baseUrl}/actuator/health`, { headers })
+                .then(res => res.json())
+                .then(data => document.getElementById('healthStatus').innerText = data.status);
+
+            // Fetch Memory Metric
+            fetch(`${baseUrl}/actuator/metrics/jvm.memory.used`, { headers })
+                .then(res => res.json())
+                .then(data => {
+                    const mb = (data.measurements[0].value / 1048576).toFixed(2);
+                    document.getElementById('memoryStatus').innerText = `${mb} MB`;
+                });
+
+            // Fetch Logs
+            fetch(`${baseUrl}/api/admin/logs`, { headers })
+                .then(res => res.json())
+                .then(data => document.getElementById('logOutput').innerText = data.join('\n'));
+        }
+    </script>
+</body>
+</html>

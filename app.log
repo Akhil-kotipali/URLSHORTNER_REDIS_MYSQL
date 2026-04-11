@@ -1,0 +1,53 @@
+2026-04-11T17:02:48.879+05:30  INFO 13880 --- [urlShortner] [restartedMain] c.a.urlShortner.UrlShortnerApplication   : Starting UrlShortnerApplication using Java 21.0.9 with PID 13880 (C:\Users\krish\OneDrive\Desktop\urlShortner\urlShortner\target\classes started by krish in C:\Users\krish\OneDrive\Desktop\urlShortner\urlShortner)
+2026-04-11T17:02:48.894+05:30  INFO 13880 --- [urlShortner] [restartedMain] c.a.urlShortner.UrlShortnerApplication   : No active profile set, falling back to 1 default profile: "default"
+2026-04-11T17:02:49.051+05:30  INFO 13880 --- [urlShortner] [restartedMain] .e.DevToolsPropertyDefaultsPostProcessor : Devtools property defaults active! Set 'spring.devtools.add-properties' to 'false' to disable
+2026-04-11T17:02:49.054+05:30  INFO 13880 --- [urlShortner] [restartedMain] .e.DevToolsPropertyDefaultsPostProcessor : For additional web related logging consider setting the 'logging.level.web' property to 'DEBUG'
+2026-04-11T17:02:52.409+05:30  INFO 13880 --- [urlShortner] [restartedMain] .s.d.r.c.RepositoryConfigurationDelegate : Multiple Spring Data modules found, entering strict repository configuration mode
+2026-04-11T17:02:52.415+05:30  INFO 13880 --- [urlShortner] [restartedMain] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2026-04-11T17:02:52.844+05:30  INFO 13880 --- [urlShortner] [restartedMain] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 404 ms. Found 2 JPA repository interfaces.
+2026-04-11T17:02:52.976+05:30  INFO 13880 --- [urlShortner] [restartedMain] .s.d.r.c.RepositoryConfigurationDelegate : Multiple Spring Data modules found, entering strict repository configuration mode
+2026-04-11T17:02:52.978+05:30  INFO 13880 --- [urlShortner] [restartedMain] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data Redis repositories in DEFAULT mode.
+2026-04-11T17:02:53.031+05:30  INFO 13880 --- [urlShortner] [restartedMain] .RepositoryConfigurationExtensionSupport : Spring Data Redis - Could not safely identify store assignment for repository candidate interface com.akhil.urlShortner.repositories.UrlRepository; If you want this repository to be a Redis repository, consider annotating your entities with one of these annotations: org.springframework.data.redis.core.RedisHash (preferred), or consider extending one of the following types with your repository: org.springframework.data.keyvalue.repository.KeyValueRepository
+2026-04-11T17:02:53.042+05:30  INFO 13880 --- [urlShortner] [restartedMain] .RepositoryConfigurationExtensionSupport : Spring Data Redis - Could not safely identify store assignment for repository candidate interface com.akhil.urlShortner.repositories.UserRepository; If you want this repository to be a Redis repository, consider annotating your entities with one of these annotations: org.springframework.data.redis.core.RedisHash (preferred), or consider extending one of the following types with your repository: org.springframework.data.keyvalue.repository.KeyValueRepository
+2026-04-11T17:02:53.043+05:30  INFO 13880 --- [urlShortner] [restartedMain] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 27 ms. Found 0 Redis repository interfaces.
+2026-04-11T17:02:55.597+05:30  INFO 13880 --- [urlShortner] [restartedMain] o.s.boot.tomcat.TomcatWebServer          : Tomcat initialized with port 8080 (http)
+2026-04-11T17:02:55.642+05:30  INFO 13880 --- [urlShortner] [restartedMain] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2026-04-11T17:02:55.643+05:30  INFO 13880 --- [urlShortner] [restartedMain] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/11.0.20]
+2026-04-11T17:02:55.882+05:30  INFO 13880 --- [urlShortner] [restartedMain] b.w.c.s.WebApplicationContextInitializer : Root WebApplicationContext: initialization completed in 6822 ms
+2026-04-11T17:02:56.896+05:30  INFO 13880 --- [urlShortner] [restartedMain] org.hibernate.orm.jpa                    : HHH008540: Processing PersistenceUnitInfo [name: default]
+2026-04-11T17:02:57.073+05:30  INFO 13880 --- [urlShortner] [restartedMain] org.hibernate.orm.core                   : HHH000001: Hibernate ORM core version 7.2.7.Final
+2026-04-11T17:02:58.391+05:30  INFO 13880 --- [urlShortner] [restartedMain] o.s.o.j.p.SpringPersistenceUnitInfo      : No LoadTimeWeaver setup: ignoring JPA class transformer
+2026-04-11T17:02:58.491+05:30  INFO 13880 --- [urlShortner] [restartedMain] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Starting...
+2026-04-11T17:02:59.592+05:30  INFO 13880 --- [urlShortner] [restartedMain] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Added connection com.mysql.cj.jdbc.ConnectionImpl@7a67df31
+2026-04-11T17:02:59.598+05:30  INFO 13880 --- [urlShortner] [restartedMain] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Start completed.
+2026-04-11T17:03:00.049+05:30  INFO 13880 --- [urlShortner] [restartedMain] org.hibernate.orm.connections.pooling    : HHH10001005: Database info:
+	Database JDBC URL [jdbc:mysql://localhost:3306/testdb]
+	Database driver: MySQL Connector/J
+	Database dialect: MySQLDialect
+	Database version: 8.0.42
+	Default catalog/schema: testdb/undefined
+	Autocommit mode: undefined/unknown
+	Isolation level: REPEATABLE_READ [default REPEATABLE_READ]
+	JDBC fetch size: none
+	Pool: DataSourceConnectionProvider
+	Minimum pool size: undefined/unknown
+	Maximum pool size: undefined/unknown
+2026-04-11T17:03:02.518+05:30  INFO 13880 --- [urlShortner] [restartedMain] org.hibernate.orm.core                   : HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2026-04-11T17:03:03.914+05:30  INFO 13880 --- [urlShortner] [restartedMain] j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'default'
+2026-04-11T17:03:04.183+05:30  INFO 13880 --- [urlShortner] [restartedMain] o.s.d.j.r.query.QueryEnhancerFactories   : Hibernate is in classpath; If applicable, HQL parser will be used.
+2026-04-11T17:03:05.932+05:30  WARN 13880 --- [urlShortner] [restartedMain] JpaBaseConfiguration$JpaWebConfiguration : spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2026-04-11T17:03:06.192+05:30  WARN 13880 --- [urlShortner] [restartedMain] .s.a.UserDetailsServiceAutoConfiguration : 
+
+Using generated security password: be9a7b44-3d61-461a-9b7f-85f766ec4cdc
+
+This generated password is for development use only. Your security configuration must be updated before running your application in production.
+
+2026-04-11T17:03:06.219+05:30  INFO 13880 --- [urlShortner] [restartedMain] r$InitializeUserDetailsManagerConfigurer : Global AuthenticationManager configured with UserDetailsService bean with name inMemoryUserDetailsManager
+2026-04-11T17:03:06.734+05:30  INFO 13880 --- [urlShortner] [restartedMain] o.s.b.w.a.WelcomePageHandlerMapping      : Adding welcome page: class path resource [static/index.html]
+2026-04-11T17:03:09.031+05:30  INFO 13880 --- [urlShortner] [restartedMain] o.s.b.a.e.web.EndpointLinksResolver      : Exposing 3 endpoints beneath base path '/actuator'
+2026-04-11T17:03:09.059+05:30  INFO 13880 --- [urlShortner] [RMI TCP Connection(2)-127.0.0.1] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring DispatcherServlet 'dispatcherServlet'
+2026-04-11T17:03:09.060+05:30  INFO 13880 --- [urlShortner] [RMI TCP Connection(2)-127.0.0.1] o.s.web.servlet.DispatcherServlet        : Initializing Servlet 'dispatcherServlet'
+2026-04-11T17:03:09.063+05:30  INFO 13880 --- [urlShortner] [RMI TCP Connection(2)-127.0.0.1] o.s.b.f.s.DefaultListableBeanFactory     : Obtaining singleton bean 'controllerEndpointHandlerMapping' in thread "RMI TCP Connection(2)-127.0.0.1" while other thread holds singleton lock for other beans [controllerEndpointHandlerMapping]
+2026-04-11T17:03:09.067+05:30  INFO 13880 --- [urlShortner] [RMI TCP Connection(2)-127.0.0.1] o.s.web.servlet.DispatcherServlet        : Completed initialization in 7 ms
+2026-04-11T17:03:09.542+05:30  INFO 13880 --- [urlShortner] [restartedMain] o.s.boot.tomcat.TomcatWebServer          : Tomcat started on port 8080 (http) with context path '/'
+2026-04-11T17:03:09.556+05:30  INFO 13880 --- [urlShortner] [restartedMain] c.a.urlShortner.UrlShortnerApplication   : Started UrlShortnerApplication in 21.812 seconds (process running for 24.155)

@@ -56,4 +56,8 @@ public class UrlController {
         return ResponseEntity.status(201).header("Link", "<" + longUrl + ">; rel=preconnect").body(customUrl);
     }
     
+    @GetMapping("/api/ping")
+    public ResponseEntity<String> ping() {
+        return ResponseEntity.ok("pong");
+    }
 }
