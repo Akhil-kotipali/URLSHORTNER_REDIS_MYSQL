@@ -30,8 +30,7 @@ public class UrlController {
 
 @PostMapping("/api/urls")
 public ResponseEntity<CreateUrlResponse> createShortUrl(@RequestBody @Valid UrlRequest request, Principal principal) {
-    // principal.getName() extracts the username from the validated JWT
-    CreateUrlResponse response = urlService.createShortUrl(request.getLongUrl(), principal.getName());
+    CreateUrlResponse response = urlService.createShortUrl(request, principal.getName());
     return ResponseEntity.status(201).body(response);
 }
 

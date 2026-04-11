@@ -8,6 +8,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/auth")
@@ -27,8 +28,8 @@ public class AuthController {
         if (userRepository.findByUsername(user.getUsername()).isPresent()) {
             return ResponseEntity.badRequest().body(Map.of("error", "Username taken"));
         }
-        // First user becomes admin, rest are normal users
-        user.setRole(userRepository.count() == 0 ? "ROLE_ADMIN" : "ROLE_USER");
+        
+        user.setRole("ROLE_USER"); // All new public registrations are standard users
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         userRepository.save(user);
         return ResponseEntity.ok(Map.of("message", "Registered successfully"));
@@ -36,13 +37,15 @@ public class AuthController {
 
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody User user) {
-        User existingUser = userRepository.findByUsername(user.getUsername())
-                .orElseThrow(() -> new RuntimeException("User not found"));
+        Optional<User> existingUserOpt = userRepository.findByUsername(user.getUsername());
         
-        if (passwordEncoder.matches(user.getPassword(), existingUser.getPassword())) {
-            String token = jwtUtil.generateToken(existingUser.getUsername(), existingUser.getRole());
-            return ResponseEntity.ok(Map.of("token", token, "role", existingUser.getRole()));
+        // Return 401 instead of 500 if user doesn't exist or password doesn't match
+        if (existingUserOpt.isEmpty() || !passwordEncoder.matches(user.getPassword(), existingUserOpt.get().getPassword())) {
+            return ResponseEntity.status(401).body(Map.of("error", "Invalid username or password"));
         }
-        return ResponseEntity.status(401).body(Map.of("error", "Invalid credentials"));
+
+        User existingUser = existingUserOpt.get();
+        String token = jwtUtil.generateToken(existingUser.getUsername(), existingUser.getRole());
+        return ResponseEntity.ok(Map.of("token", token, "role", existingUser.getRole()));
     }
 }
