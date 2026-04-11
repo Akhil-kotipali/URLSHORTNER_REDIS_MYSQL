@@ -1,6 +1,9 @@
 package com.akhil.urlShortner.controllers;
 
 import java.net.URI;
+import java.security.Principal;
+import java.util.List;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -25,27 +28,18 @@ public class UrlController {
         this.urlService = urlService;
     }
 
-  @PostMapping("/api/urls")
-    public ResponseEntity<CreateUrlResponse> createShortUrl(@RequestBody @Valid UrlRequest request) {
-   
-    Url url = new Url();
-    url.setLongUrl(request.getLongUrl());
-    
-    CreateUrlResponse response = urlService.createShortUrl(url);
-
+@PostMapping("/api/urls")
+public ResponseEntity<CreateUrlResponse> createShortUrl(@RequestBody @Valid UrlRequest request, Principal principal) {
+    // principal.getName() extracts the username from the validated JWT
+    CreateUrlResponse response = urlService.createShortUrl(request.getLongUrl(), principal.getName());
     return ResponseEntity.status(201).body(response);
-    }
+}
 
-    @GetMapping("/{code}")
-    public ResponseEntity<Void> redirectToLongUrl(@PathVariable String code) {
-        
-        String longUrl = urlService.getLongUrl(code);
-        
-        return ResponseEntity
-                .status(302)
-                .location(URI.create(longUrl))
-                .build();
-    }
+@GetMapping("/{code:[a-zA-Z0-9]+}")
+public ResponseEntity<Void> redirectToLongUrl(@PathVariable String code) {
+    String longUrl = urlService.getLongUrl(code);
+    return ResponseEntity.status(302).location(URI.create(longUrl)).build();
+}
 
     @PostMapping("/create-custom")
     public ResponseEntity<String> createCustomUrl(
@@ -60,4 +54,10 @@ public class UrlController {
     public ResponseEntity<String> ping() {
         return ResponseEntity.ok("pong");
     }
+
+    @GetMapping("/api/urls/my-links")
+public ResponseEntity<List<Url>> getMyLinks(Principal principal) {
+    return ResponseEntity.ok(urlService.getUserLinks(principal.getName()));
+}
+
 }

@@ -1,5 +1,7 @@
 package com.akhil.urlShortner.services;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
@@ -9,33 +11,45 @@ import org.springframework.web.server.ResponseStatusException;
 
 import com.akhil.urlShortner.dto.CreateUrlResponse;
 import com.akhil.urlShortner.models.Url;
+import com.akhil.urlShortner.models.User;
 import com.akhil.urlShortner.repositories.UrlRepository;
+import com.akhil.urlShortner.repositories.UserRepository;
 import com.akhil.urlShortner.utils.UrlShortenerUtil;
 
 @Service
 public class UrlService {
 
-    private final UrlRepository urlRepository;
+// Add UserRepository to the constructor in UrlService
+private final UrlRepository urlRepository;
+private final UserRepository userRepository; // ADD THIS
 
-    @Value("${app.base-url}")
-    private String baseUrl;
+@Value("${app.base-url}")
+private String baseUrl;
 
-    public UrlService(UrlRepository urlRepository) {
-        this.urlRepository = urlRepository;
-    }
+public UrlService(UrlRepository urlRepository, UserRepository userRepository) {
+    this.urlRepository = urlRepository;
+    this.userRepository = userRepository;
+}
 
-    public CreateUrlResponse createShortUrl(Url url) {
-        
-        Url savedUrl = urlRepository.save(url);
-        
-        String shortCode = UrlShortenerUtil.encode(savedUrl.getId());
-        String shortUrl = baseUrl + "/" + shortCode;
-        
-        savedUrl.setShortCode(shortCode);
-        urlRepository.save(savedUrl);
-        
-        return new CreateUrlResponse(shortUrl, shortCode);
-    }
+// Update the create method to accept the username
+public CreateUrlResponse createShortUrl(String longUrl, String username) {
+    User user = userRepository.findByUsername(username)
+            .orElseThrow(() -> new RuntimeException("User not found"));
+
+    Url url = new Url();
+    url.setLongUrl(longUrl);
+    url.setUser(user); // Attach the user!
+    
+    Url savedUrl = urlRepository.save(url);
+    
+    String shortCode = UrlShortenerUtil.encode(savedUrl.getId());
+    String shortUrl = baseUrl + "/" + shortCode;
+    
+    savedUrl.setShortCode(shortCode);
+    urlRepository.save(savedUrl);
+    
+    return new CreateUrlResponse(shortUrl, shortCode);
+}
 
     @Cacheable(value = "urls", key = "#code")
     public String getLongUrl(String code) {
@@ -72,4 +86,10 @@ public class UrlService {
 
         return url.getLongUrl();
     }
+
+    public List<Url> getUserLinks(String username) {
+    User user = userRepository.findByUsername(username)
+            .orElseThrow(() -> new RuntimeException("User not found"));
+    return urlRepository.findByUser(user);
+}
 }
