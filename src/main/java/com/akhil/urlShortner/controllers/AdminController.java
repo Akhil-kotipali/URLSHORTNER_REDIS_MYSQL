@@ -29,15 +29,31 @@ public class AdminController {
         this.redisTemplate = redisTemplate;
         this.userRepository = userRepository;
         this.urlRepository = urlRepository;
-        this.systemSettingsRepository=systemSettingsRepository;
+        this.systemSettingsRepository = systemSettingsRepository;
     }
 
-    // --- SYSTEM TELEMETRY ---
+    // --- SETTINGS MANAGEMENT ---
+    @GetMapping("/settings")
+    public ResponseEntity<SystemSettings> getSettings() {
+        return ResponseEntity.ok(systemSettingsRepository.findById(1L).orElseThrow());
+    }
+
+    @PostMapping("/settings")
+    public ResponseEntity<?> updateSettings(@RequestBody SystemSettings newSettings) {
+        SystemSettings settings = systemSettingsRepository.findById(1L).orElseThrow();
+        settings.setDefaultExpiryHours(newSettings.getDefaultExpiryHours());
+        settings.setDefaultMaxTaps(newSettings.getDefaultMaxTaps());
+        settings.setMaxLinksPerUser(newSettings.getMaxLinksPerUser());
+        systemSettingsRepository.save(settings);
+        return ResponseEntity.ok(Map.of("message", "Global rules updated successfully."));
+    }
+
+    // --- SYSTEM LOGS & CACHE ---
     @GetMapping("/logs")
     public List<String> getLogs() {
         try {
-            List<String> allLines = Files.readAllLines(Paths.get("app.log"));
-            return allLines.stream().skip(Math.max(0, allLines.size() - 100)).collect(Collectors.toList());
+            List<String> lines = Files.readAllLines(Paths.get("app.log"));
+            return lines.stream().skip(Math.max(0, lines.size() - 100)).collect(Collectors.toList());
         } catch (Exception e) {
             return List.of("Log file not found or empty.");
         }
@@ -45,21 +61,14 @@ public class AdminController {
 
     @PostMapping("/clear-cache/{type}")
     public ResponseEntity<?> clearCacheType(@PathVariable String type) {
-        try {
-            if ("all".equals(type)) {
-                redisTemplate.getConnectionFactory().getConnection().serverCommands().flushDb();
-                return ResponseEntity.ok(Map.of("message", "CRITICAL: Entire Redis Database Flushed."));
-            } else if ("urls".equals(type)) {
-                redisTemplate.delete(redisTemplate.keys("urls::*"));
-                return ResponseEntity.ok(Map.of("message", "Standard User URL cache cleared."));
-            } else if ("admin".equals(type)) {
-                redisTemplate.delete(redisTemplate.keys("admin-urls::*"));
-                return ResponseEntity.ok(Map.of("message", "Custom Admin URL cache cleared."));
-            }
-            return ResponseEntity.badRequest().body(Map.of("error", "Unknown cache type"));
-        } catch (Exception e) {
-            return ResponseEntity.status(500).body(Map.of("error", "Redis error: " + e.getMessage()));
+        if ("all".equals(type)) {
+            redisTemplate.getConnectionFactory().getConnection().serverCommands().flushDb();
+            return ResponseEntity.ok(Map.of("message", "All Redis Flushed."));
+        } else if ("urls".equals(type)) {
+            redisTemplate.delete(redisTemplate.keys("urls::*"));
+            return ResponseEntity.ok(Map.of("message", "Standard cache cleared."));
         }
+        return ResponseEntity.badRequest().body(Map.of("error", "Unknown cache type"));
     }
 
     // --- USER CRUD MANAGEMENT ---
@@ -72,19 +81,17 @@ public class AdminController {
     public ResponseEntity<?> deleteUser(@PathVariable Long id) {
         if(id == 1) return ResponseEntity.badRequest().body(Map.of("error", "Cannot delete the primary admin."));
         
-        // Delete all URLs owned by this user first to prevent foreign key errors
         User user = userRepository.findById(id).orElseThrow();
-        List<Url> userUrls = urlRepository.findByUser(user);
-        urlRepository.deleteAll(userUrls);
-        
+        urlRepository.deleteAll(urlRepository.findByUser(user));
         userRepository.deleteById(id);
-        return ResponseEntity.ok(Map.of("message", "User and all associated URLs deleted."));
+        
+        return ResponseEntity.ok(Map.of("message", "User and URLs deleted."));
     }
 
-    // --- INDIVIDUAL USER URL MANAGEMENT ---
+    // --- INDIVIDUAL USER URL CRUD ---
     @GetMapping("/users/{id}/urls")
     public ResponseEntity<List<Url>> getUserUrls(@PathVariable Long id) {
-        User user = userRepository.findById(id).orElseThrow(() -> new RuntimeException("User not found"));
+        User user = userRepository.findById(id).orElseThrow();
         return ResponseEntity.ok(urlRepository.findByUser(user));
     }
 
@@ -93,19 +100,4 @@ public class AdminController {
         urlRepository.deleteById(urlId);
         return ResponseEntity.ok(Map.of("message", "URL successfully deleted."));
     }
-
-    @GetMapping("/settings")
-public ResponseEntity<SystemSettings> getSettings() {
-    return ResponseEntity.ok(systemSettingsRepository.findById(1L).orElseThrow());
-}
-
-@PostMapping("/settings")
-public ResponseEntity<?> updateSettings(@RequestBody SystemSettings newSettings) {
-    SystemSettings settings = systemSettingsRepository.findById(1L).orElseThrow();
-    settings.setDefaultExpiryHours(newSettings.getDefaultExpiryHours());
-    settings.setDefaultMaxTaps(newSettings.getDefaultMaxTaps());
-    settings.setMaxLinksPerUser(newSettings.getMaxLinksPerUser());
-    systemSettingsRepository.save(settings);
-    return ResponseEntity.ok(Map.of("message", "Global settings updated successfully."));
-}
 }

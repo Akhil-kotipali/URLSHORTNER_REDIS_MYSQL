@@ -3,9 +3,9 @@ package com.akhil.urlShortner.models;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 
+import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.validator.constraints.URL;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import jakarta.persistence.Column;
@@ -38,13 +38,14 @@ public class Url implements Serializable {
     @JoinColumn(name = "user_id")
     private User user;
 
-    // --- NEW ANALYTICS & LIMIT FIELDS ---
+    @CreationTimestamp
+    @Column(updatable = false)
+    private LocalDateTime createdAt = LocalDateTime.now();
+
     private int clicks = 0;
 
-    private Integer clickLimit; // Using Integer so it can be null (no limit)
-
-    @JsonFormat(pattern="yyyy-MM-dd HH:mm:ss")
-    private LocalDateTime expiresAt;
+    private Integer clickLimit; // Null = use global settings
+    private LocalDateTime expiresAt; // Null = use global settings
 
     public Url() {}
 
@@ -57,6 +58,8 @@ public class Url implements Serializable {
     public void setShortCode(String shortCode) { this.shortCode = shortCode; }
     public User getUser() { return user; }
     public void setUser(User user) { this.user = user; }
+    public LocalDateTime getCreatedAt() { return createdAt; }
+    public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }
     public int getClicks() { return clicks; }
     public void setClicks(int clicks) { this.clicks = clicks; }
     public Integer getClickLimit() { return clickLimit; }

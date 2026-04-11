@@ -15,8 +15,8 @@
             <input type="text" id="username" placeholder="Username" class="w-full border p-3 mb-4 rounded bg-gray-50 outline-none focus:ring-2 focus:ring-blue-500">
             <input type="password" id="password" placeholder="Password" class="w-full border p-3 mb-6 rounded bg-gray-50 outline-none focus:ring-2 focus:ring-blue-500">
             <div class="flex justify-between gap-4">
-                <button onclick="authenticate('login')" class="w-1/2 bg-gray-900 text-white px-4 py-3 rounded hover:bg-gray-800 transition font-bold shadow">Login</button>
-                <button onclick="authenticate('register')" class="w-1/2 bg-blue-600 text-white px-4 py-3 rounded hover:bg-blue-700 transition font-bold shadow">Register</button>
+                <button onclick="authenticate('login')" class="w-1/2 bg-gray-900 text-white px-4 py-3 rounded hover:bg-gray-800 font-bold shadow">Login</button>
+                <button onclick="authenticate('register')" class="w-1/2 bg-blue-600 text-white px-4 py-3 rounded hover:bg-blue-700 font-bold shadow">Register</button>
             </div>
             <p id="authMessage" class="mt-4 text-center font-bold h-6 text-red-500"></p>
         </div>
@@ -28,15 +28,15 @@
             <p id="welcomeText" class="text-sm text-gray-400 mt-1"></p>
         </div>
         <nav class="flex-1 p-4 space-y-2">
-            <button onclick="switchTab('dashboardTab')" class="w-full text-left p-3 rounded bg-gray-800 hover:bg-gray-700 font-bold transition">🏠 My Links</button>
+            <button onclick="switchTab('dashboardTab')" class="w-full text-left p-3 rounded hover:bg-gray-800 font-bold">🏠 My Links</button>
             <div id="adminMenus" class="hidden flex-col space-y-2 mt-6">
-                <p class="text-xs text-gray-500 uppercase font-black tracking-widest pl-3 mb-2 mt-4">Admin Controls</p>
-                <button onclick="switchTab('telemetryTab')" class="w-full text-left p-3 rounded hover:bg-gray-800 text-gray-300 font-bold transition">📊 System Telemetry</button>
-                <button onclick="switchTab('usersTab')" class="w-full text-left p-3 rounded hover:bg-gray-800 text-gray-300 font-bold transition">👥 Manage System</button>
+                <p class="text-xs text-gray-500 uppercase font-black pl-3 mb-2 mt-4">Admin Controls</p>
+                <button onclick="switchTab('telemetryTab')" class="w-full text-left p-3 rounded hover:bg-gray-800 text-gray-300 font-bold">📊 Telemetry</button>
+                <button onclick="switchTab('usersTab')" class="w-full text-left p-3 rounded hover:bg-gray-800 text-gray-300 font-bold">👥 System & Users</button>
             </div>
         </nav>
         <div class="p-4 border-t border-gray-800">
-            <button onclick="logout()" class="w-full bg-red-600 px-4 py-2 rounded hover:bg-red-700 font-bold transition">Logout</button>
+            <button onclick="logout()" class="w-full bg-red-600 px-4 py-2 rounded hover:bg-red-700 font-bold">Logout</button>
         </div>
     </aside>
 
@@ -46,45 +46,32 @@
             <h2 class="text-3xl mb-6 font-black border-b pb-2 text-gray-800">My Link Manager</h2>
             
             <div class="bg-white p-6 rounded shadow-sm border mb-8">
-                <div class="flex gap-4 mb-2">
-                    <input type="url" id="longUrlInput" placeholder="Enter long URL (https://...)" class="flex-1 border p-3 rounded bg-gray-50 outline-none focus:ring-2 focus:ring-blue-500">
-                    <button onclick="createShortLink()" class="bg-blue-600 text-white px-8 py-3 rounded hover:bg-blue-700 font-bold transition shadow">Shorten</button>
+                <div class="flex gap-4 mb-4">
+                    <input type="url" id="longUrlInput" placeholder="Enter long URL (https://...)" class="flex-1 border p-3 rounded outline-none focus:ring-2">
+                    <button onclick="createShortLink()" class="bg-blue-600 text-white px-8 py-3 rounded hover:bg-blue-700 font-bold shadow">Shorten</button>
                 </div>
-                <p class="text-xs text-gray-500 font-bold mb-4">Links automatically expire based on system rules.</p>
-                <p id="linkResult" class="text-green-600 font-bold mt-2"></p>
+                <div class="flex gap-4 bg-blue-50 p-4 rounded border">
+                    <div class="flex-1">
+                        <label class="text-xs font-bold text-blue-800 uppercase block mb-1">Max Taps (Optional)</label>
+                        <input type="number" id="limitInput" placeholder="Overrides global limit" class="w-full border p-2 rounded">
+                    </div>
+                    <div class="flex-1">
+                        <label class="text-xs font-bold text-blue-800 uppercase block mb-1">Expire In Hours (Optional)</label>
+                        <input type="number" id="expireInput" placeholder="Overrides global rule" class="w-full border p-2 rounded">
+                    </div>
+                </div>
+                <p id="linkResult" class="text-green-600 font-bold mt-4"></p>
             </div>
-
-            <div id="linksContainer" class="bg-white rounded shadow-sm border p-4 text-center text-gray-500">Fetching links...</div>
+            <div id="linksContainer" class="bg-white rounded shadow-sm border p-4 text-center">Fetching links...</div>
         </section>
 
         <section id="telemetryTab" class="tab-content hidden max-w-6xl mx-auto">
-            <h2 class="text-3xl mb-6 font-black text-gray-800">Live Telemetry <span class="text-sm text-green-600 ml-2 animate-pulse">● LIVE</span></h2>
+            <h2 class="text-3xl mb-6 font-black text-gray-800">Live Telemetry</h2>
             <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-                <div class="bg-white p-6 rounded shadow-sm border text-center flex flex-col items-center">
-                    <h3 class="text-gray-500 uppercase text-xs font-black tracking-widest mb-2">CPU</h3>
-                    <div class="w-40 h-20 relative"><canvas id="cpuChart"></canvas><div class="absolute bottom-0 left-0 w-full text-xl font-bold" id="cpuLabel">0%</div></div>
-                </div>
-                <div class="bg-white p-6 rounded shadow-sm border text-center flex flex-col items-center">
-                    <h3 class="text-gray-500 uppercase text-xs font-black tracking-widest mb-2">RAM</h3>
-                    <div class="w-40 h-20 relative"><canvas id="ramChart"></canvas><div class="absolute bottom-0 left-0 w-full text-lg font-bold" id="ramLabel">0MB</div></div>
-                </div>
-                <div class="bg-white p-6 rounded shadow-sm border flex flex-col justify-between">
-                    <div>
-                        <h3 class="text-gray-500 uppercase text-xs font-black tracking-widest">Global Server Hits</h3>
-                        <p id="trafficLabel" class="text-4xl font-black text-blue-600 mt-2">0</p>
-                    </div>
-                </div>
+                <div class="bg-white p-6 rounded shadow-sm border text-center relative"><canvas id="cpuChart"></canvas><div class="absolute bottom-6 left-0 w-full text-xl font-bold" id="cpuLabel">0%</div></div>
+                <div class="bg-white p-6 rounded shadow-sm border text-center relative"><canvas id="ramChart"></canvas><div class="absolute bottom-6 left-0 w-full text-lg font-bold" id="ramLabel">0MB</div></div>
+                <div class="bg-white p-6 rounded shadow-sm border"><h3 class="text-gray-500 font-black">Server Hits</h3><p id="trafficLabel" class="text-4xl text-blue-600 font-black">0</p></div>
             </div>
-            
-            <div class="bg-white p-6 rounded shadow-sm border mb-8">
-                <h3 class="text-gray-800 uppercase text-sm font-black tracking-widest mb-4">Cache Controls</h3>
-                <div class="flex gap-4">
-                    <button onclick="clearCache('urls')" class="flex-1 border border-blue-500 text-blue-600 py-2 rounded hover:bg-blue-50 font-bold transition">Clear Standard URLs</button>
-                    <button onclick="clearCache('admin')" class="flex-1 border border-purple-500 text-purple-600 py-2 rounded hover:bg-purple-50 font-bold transition">Clear Custom URLs</button>
-                    <button onclick="clearCache('all')" class="flex-1 bg-red-600 text-white py-2 rounded hover:bg-red-700 font-bold transition">⚠️ FLUSH ALL REDIS</button>
-                </div>
-            </div>
-
             <div class="bg-gray-900 p-4 rounded shadow font-mono text-xs h-80 flex flex-col">
                 <div class="text-gray-300 font-bold mb-2 border-b border-gray-700 pb-2">System Event Log</div>
                 <div id="logOutput" class="overflow-y-auto flex-1 text-gray-300 space-y-1"></div>
@@ -92,47 +79,47 @@
         </section>
 
         <section id="usersTab" class="tab-content hidden max-w-6xl mx-auto">
-            <h2 class="text-3xl mb-6 font-black text-gray-800 border-b pb-2">System Management</h2>
+            <h2 class="text-3xl mb-6 font-black text-gray-800 border-b pb-2">System & User Management</h2>
             
             <div class="bg-white p-6 rounded shadow-sm border border-blue-200 mb-8">
-                <h3 class="text-gray-800 uppercase text-sm font-black tracking-widest mb-4">Global Rule Engine</h3>
+                <h3 class="text-gray-800 uppercase text-sm font-black mb-4">Global Rule Engine (Applies Immediately to defaults)</h3>
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                     <div>
-                        <label class="text-xs font-bold text-gray-600 uppercase block mb-1">Default Expiry (Hours)</label>
-                        <input type="number" id="cfgExpiry" class="w-full border p-2 rounded focus:ring-2 outline-none">
+                        <label class="text-xs font-bold text-gray-600 uppercase mb-1 block">Default Expiry (Hours)</label>
+                        <input type="number" id="cfgExpiry" class="w-full border p-2 rounded">
                     </div>
                     <div>
-                        <label class="text-xs font-bold text-gray-600 uppercase block mb-1">Max Taps (0 = Infinite)</label>
-                        <input type="number" id="cfgTaps" class="w-full border p-2 rounded focus:ring-2 outline-none">
+                        <label class="text-xs font-bold text-gray-600 uppercase mb-1 block">Max Taps (0 = Infinite)</label>
+                        <input type="number" id="cfgTaps" class="w-full border p-2 rounded">
                     </div>
                     <div>
-                        <label class="text-xs font-bold text-gray-600 uppercase block mb-1">Max Links Per User</label>
-                        <input type="number" id="cfgLinks" class="w-full border p-2 rounded focus:ring-2 outline-none">
+                        <label class="text-xs font-bold text-gray-600 uppercase mb-1 block">Max Links Per User</label>
+                        <input type="number" id="cfgLinks" class="w-full border p-2 rounded">
                     </div>
                 </div>
-                <button onclick="saveSettings()" class="mt-4 bg-gray-900 text-white px-6 py-2 rounded font-bold shadow hover:bg-gray-800 transition">Save Global Rules</button>
+                <button onclick="saveSettings()" class="mt-4 bg-gray-900 text-white px-6 py-2 rounded font-bold hover:bg-gray-800">Save Global Rules</button>
             </div>
 
-            <div id="usersContainer" class="bg-white rounded shadow-sm border overflow-hidden"></div>
+            <h3 class="text-xl font-bold mb-4">User Accounts</h3>
+            <div id="usersContainer" class="bg-white rounded shadow-sm border mb-8 overflow-hidden"></div>
 
-            <div id="userUrlsSection" class="hidden mt-8 bg-white p-6 rounded shadow-sm border border-blue-200">
+            <div id="userUrlsSection" class="hidden bg-white p-6 rounded shadow-sm border border-red-200">
                 <div class="flex justify-between items-center mb-4 border-b pb-2">
                     <h3 class="text-xl font-bold text-gray-800" id="userUrlsTitle">Viewing URLs</h3>
-                    <button onclick="document.getElementById('userUrlsSection').classList.add('hidden')" class="text-red-500 font-bold hover:underline">Close X</button>
+                    <button onclick="document.getElementById('userUrlsSection').classList.add('hidden')" class="bg-gray-200 text-gray-800 px-3 py-1 rounded font-bold hover:bg-gray-300">Close</button>
                 </div>
                 <div id="specificUserUrlsContainer"></div>
             </div>
         </section>
-
     </main>
 
     <script>
         const baseUrl = window.location.origin; 
+        let globalSettings = { defaultExpiryHours: 1, defaultMaxTaps: 0 }; // Local copy for dynamic frontend rendering
         let pollInterval;
         let liveTimerInterval;
         let cpuChartInstance, ramChartInstance;
 
-        // Check if logged in on load
         window.onload = () => {
             const token = localStorage.getItem('jwt');
             if (token) initializeApp(localStorage.getItem('role'), localStorage.getItem('username'));
@@ -168,10 +155,11 @@
             document.getElementById('mainContent').classList.remove('hidden');
             document.getElementById('welcomeText').innerText = `Welcome, ${username}`;
 
+            fetchSettings(); // Both users and admins need the settings to calculate timers accurately
+            
             if (role === 'ROLE_ADMIN') {
                 document.getElementById('adminMenus').classList.remove('hidden');
                 document.getElementById('adminMenus').classList.add('flex');
-                fetchSettings();
                 initCharts();
                 startAdminPolling();
             }
@@ -192,36 +180,16 @@
             if(tabId === 'usersTab') fetchAllUsers();
         }
 
-        // --- DASHBOARD: URL CREATION ---
-        async function createShortLink() {
-            const longUrl = document.getElementById('longUrlInput').value;
-            const res = await fetch(`${baseUrl}/api/urls`, {
-                method: 'POST', 
-                headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${localStorage.getItem('jwt')}` },
-                body: JSON.stringify({ longUrl })
-            });
-
-            if(res.ok) {
-                document.getElementById('longUrlInput').value = ''; 
-                fetchMyLinks(); 
-            } else {
-                alert("Failed to create URL. Check format or max link limits.");
-            }
-        }
-
-        async function fetchMyLinks() {
-            const res = await fetch(`${baseUrl}/api/urls/my-links`, { headers: { 'Authorization': `Bearer ${localStorage.getItem('jwt')}` } });
-            if (res.ok) renderUrlTable(await res.json(), 'linksContainer', false);
-        }
-
-        // --- ADMIN: SETTINGS & USERS ---
+        // --- GLOBAL SETTINGS LOGIC ---
         async function fetchSettings() {
             const res = await fetch(`${baseUrl}/api/admin/settings`, { headers: { 'Authorization': `Bearer ${localStorage.getItem('jwt')}` } });
             if (res.ok) {
-                const data = await res.json();
-                document.getElementById('cfgExpiry').value = data.defaultExpiryHours;
-                document.getElementById('cfgTaps').value = data.defaultMaxTaps;
-                document.getElementById('cfgLinks').value = data.maxLinksPerUser;
+                globalSettings = await res.json();
+                if(document.getElementById('cfgExpiry')) {
+                    document.getElementById('cfgExpiry').value = globalSettings.defaultExpiryHours;
+                    document.getElementById('cfgTaps').value = globalSettings.defaultMaxTaps;
+                    document.getElementById('cfgLinks').value = globalSettings.maxLinksPerUser;
+                }
             }
         }
 
@@ -235,21 +203,55 @@
                 method: 'POST', headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${localStorage.getItem('jwt')}` },
                 body: JSON.stringify(payload)
             });
-            if(res.ok) alert("Global rules saved.");
+            if(res.ok) {
+                alert("Global rules updated! All existing default links will now follow this rule.");
+                fetchSettings(); // Refresh local copy
+                fetchAllUsers(); // Refresh the table to show new active rules
+            }
+        }
+
+        // --- URL CREATION ---
+        async function createShortLink() {
+            const longUrl = document.getElementById('longUrlInput').value;
+            const limit = document.getElementById('limitInput').value;
+            const expire = document.getElementById('expireInput').value;
+
+            const payload = { longUrl };
+            if(limit) payload.clickLimit = parseInt(limit);
+            if(expire) payload.expirationHours = parseInt(expire);
+
+            const res = await fetch(`${baseUrl}/api/urls`, {
+                method: 'POST', headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${localStorage.getItem('jwt')}` },
+                body: JSON.stringify(payload)
+            });
+
+            if(res.ok) {
+                document.getElementById('longUrlInput').value = ''; 
+                document.getElementById('limitInput').value = ''; 
+                document.getElementById('expireInput').value = ''; 
+                fetchMyLinks(); 
+            } else {
+                alert("Failed. Check format or max limits.");
+            }
+        }
+
+        // --- USER & URL CRUD MANAGEMENT ---
+        async function fetchMyLinks() {
+            const res = await fetch(`${baseUrl}/api/urls/my-links`, { headers: { 'Authorization': `Bearer ${localStorage.getItem('jwt')}` } });
+            if (res.ok) renderUrlTable(await res.json(), 'linksContainer', false);
         }
 
         async function fetchAllUsers() {
             const res = await fetch(`${baseUrl}/api/admin/users`, { headers: { 'Authorization': `Bearer ${localStorage.getItem('jwt')}` } });
             if (res.ok) {
                 const users = await res.json();
-                let html = `<table class="w-full text-left"><thead class="bg-gray-100 border-b"><tr><th class="p-4 font-bold text-gray-700">Username</th><th class="p-4 font-bold text-gray-700">Role</th><th class="p-4 font-bold text-gray-700 text-right">Actions</th></tr></thead><tbody>`;
+                let html = `<table class="w-full text-left bg-white"><thead class="bg-gray-100 border-b"><tr><th class="p-4 font-bold text-gray-700">Username</th><th class="p-4 font-bold text-gray-700 text-right">Admin Actions</th></tr></thead><tbody>`;
                 users.forEach(u => {
                     html += `<tr class="border-b hover:bg-gray-50">
-                        <td class="p-4 font-bold text-gray-900">${u.username}</td>
-                        <td class="p-4"><span class="px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded">${u.role}</span></td>
+                        <td class="p-4 font-bold text-gray-900">${u.username} <span class="ml-2 px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded">${u.role}</span></td>
                         <td class="p-4 flex gap-4 justify-end">
-                            <button onclick="viewUserUrls(${u.id}, '${u.username}')" class="bg-gray-900 text-white px-3 py-1 rounded text-sm hover:bg-gray-800 font-bold transition">View Analytics</button>
-                            <button onclick="deleteUser(${u.id})" class="bg-red-100 text-red-600 px-3 py-1 rounded text-sm hover:bg-red-200 font-bold transition">Delete</button>
+                            <button onclick="viewUserUrls(${u.id}, '${u.username}')" class="bg-gray-900 text-white px-3 py-1 rounded text-sm hover:bg-gray-800 font-bold transition">View URLs</button>
+                            <button onclick="deleteUser(${u.id})" class="bg-red-600 text-white px-3 py-1 rounded text-sm hover:bg-red-700 font-bold transition shadow">Delete User</button>
                         </td>
                     </tr>`;
                 });
@@ -259,52 +261,69 @@
 
         async function viewUserUrls(userId, username) {
             document.getElementById('userUrlsSection').classList.remove('hidden');
-            document.getElementById('userUrlsTitle').innerText = `Analytics for ${username}`;
+            document.getElementById('userUrlsTitle').innerText = `URLs owned by ${username}`;
             const res = await fetch(`${baseUrl}/api/admin/users/${userId}/urls`, { headers: { 'Authorization': `Bearer ${localStorage.getItem('jwt')}` } });
             if(res.ok) renderUrlTable(await res.json(), 'specificUserUrlsContainer', true);
         }
 
         async function deleteUser(id) {
-            if(!confirm("Are you sure? This deletes the user AND all their URLs.")) return;
+            if(!confirm("DANGER: Are you sure you want to completely delete this user and ALL their URLs?")) return;
             const res = await fetch(`${baseUrl}/api/admin/users/${id}`, { method: 'DELETE', headers: { 'Authorization': `Bearer ${localStorage.getItem('jwt')}` } });
-            if(res.ok) fetchAllUsers();
-            else alert("Cannot delete primary admin.");
+            if(res.ok) {
+                alert("User Deleted successfully.");
+                fetchAllUsers();
+                document.getElementById('userUrlsSection').classList.add('hidden');
+            } else alert("Cannot delete primary admin.");
         }
 
         async function deleteUrl(urlId) {
             if(!confirm("Delete this URL permanently?")) return;
             const res = await fetch(`${baseUrl}/api/admin/urls/${urlId}`, { method: 'DELETE', headers: { 'Authorization': `Bearer ${localStorage.getItem('jwt')}` } });
             if(res.ok) {
-                alert("URL Deleted");
+                alert("URL Deleted successfully.");
+                // Simply hide the specific user window, force admin to click View URLs again to refresh
                 document.getElementById('userUrlsSection').classList.add('hidden'); 
             }
         }
 
-        // --- SHARED TABLE & COUNTDOWN LOGIC ---
+        // --- SHARED DYNAMIC TABLE & COUNTDOWN LOGIC ---
         function renderUrlTable(links, containerId, isAdminDeleting) {
             const container = document.getElementById(containerId);
-            if(links.length === 0) { container.innerHTML = "<div class='p-4 text-center'>No URLs found.</div>"; return; }
+            if(links.length === 0) { container.innerHTML = "<div class='p-4 text-center font-bold'>No URLs found.</div>"; return; }
             
-            let html = `<table class="w-full text-left bg-white"><thead class="bg-gray-100 border-b text-sm"><tr>
-                <th class="p-3">Short Link</th>
-                <th class="p-3">Destination</th>
-                <th class="p-3 text-center">Taps</th>
-                <th class="p-3 text-center">Time Remaining</th>
-                ${isAdminDeleting ? '<th class="p-3 text-right text-red-500">Admin</th>' : ''}</tr></thead><tbody>`;
+            let html = `<table class="w-full text-left bg-white border"><thead class="bg-gray-100 border-b text-sm"><tr>
+                <th class="p-3">Short Link</th><th class="p-3">Destination</th><th class="p-3 text-center">Taps</th><th class="p-3 text-center">Time Remaining</th>
+                ${isAdminDeleting ? '<th class="p-3 text-right text-red-500">Admin Delete</th>' : ''}</tr></thead><tbody>`;
             
             links.forEach(l => {
-                const isMaxed = l.clickLimit && l.clicks >= l.clickLimit;
+                // Determine active limits (Fallback to live global settings if URL's limit is null)
+                const activeLimit = l.clickLimit !== null ? l.clickLimit : globalSettings.defaultMaxTaps;
+                const isMaxed = activeLimit > 0 && l.clicks >= activeLimit;
+                
+                // Determine active expiry time
+                let activeExpiryStr = l.expiresAt;
+                if (!activeExpiryStr && l.createdAt) {
+                    // Calculate based on creation date + live global expiry rule
+                    let d = new Date(l.createdAt);
+                    d.setHours(d.getHours() + globalSettings.defaultExpiryHours);
+                    activeExpiryStr = d.toISOString();
+                }
+
                 const statusHtml = isMaxed 
-                    ? `<span class="text-red-500 font-bold">MAXED</span>` 
-                    : (l.expiresAt ? `<span class="countdown-timer font-mono text-blue-600 font-bold" data-expire="${l.expiresAt}">Calculating...</span>` : `<span class="text-green-500 font-bold">PERMANENT</span>`);
+                    ? `<span class="text-red-500 font-bold">MAXED OUT</span>` 
+                    : `<span class="countdown-timer font-mono text-blue-600 font-bold" data-expire="${activeExpiryStr}">Calculating...</span>`;
 
                 html += `<tr class="border-b hover:bg-gray-50">
                 <td class="p-3 font-bold"><a href="${baseUrl}/${l.shortCode}" target="_blank" class="text-blue-600 hover:underline">${l.shortCode}</a></td>
                 <td class="p-3 truncate max-w-xs text-gray-500 text-sm" title="${l.longUrl}">${l.longUrl}</td>
-                <td class="p-3 text-center font-mono text-gray-800 font-bold">${l.clicks} <span class="text-xs text-gray-400 block">${l.clickLimit ? `/ ${l.clickLimit} max` : 'no limit'}</span></td>
+                <td class="p-3 text-center font-mono text-gray-800 font-bold">${l.clicks} <span class="text-xs text-gray-400 block">${activeLimit > 0 ? `/ ${activeLimit} max` : 'no limit'}</span></td>
                 <td class="p-3 text-center bg-gray-50">${statusHtml}</td>`;
                 
-                if(isAdminDeleting) html += `<td class="p-3 text-right"><button onclick="deleteUrl(${l.id})" class="text-red-500 hover:underline font-bold text-sm">Delete</button></td>`;
+                if(isAdminDeleting) {
+                    html += `<td class="p-3 text-right">
+                        <button onclick="deleteUrl(${l.id})" class="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600 font-bold text-xs shadow">Delete Link</button>
+                    </td>`;
+                }
                 html += `</tr>`;
             });
             container.innerHTML = html + `</tbody></table>`;
@@ -320,28 +339,25 @@
             const now = new Date().getTime();
 
             timers.forEach(timer => {
-                const expireDate = new Date(timer.getAttribute('data-expire') + 'Z').getTime() - (new Date().getTimezoneOffset() * 60000); 
+                // Ensure date string ends with Z so JS knows it is UTC
+                let expireStr = timer.getAttribute('data-expire');
+                if(!expireStr.endsWith('Z')) expireStr += 'Z';
+                
+                const expireDate = new Date(expireStr).getTime();
                 const distance = expireDate - now;
 
                 if (distance < 0) {
                     timer.innerHTML = "<span class='text-red-500'>EXPIRED</span>";
                     return;
                 }
-
-                const h = Math.floor(distance / (1000 * 60 * 60)); // Total hours left
+                const h = Math.floor(distance / (1000 * 60 * 60)); 
                 const m = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
                 const s = Math.floor((distance % (1000 * 60)) / 1000);
                 timer.innerText = `${h}h ${m}m ${s}s`;
             });
         }
 
-        // --- ADMIN TELEMETRY ---
-        async function clearCache(type) {
-            const res = await fetch(`${baseUrl}/api/admin/clear-cache/${type}`, { method: 'POST', headers: { 'Authorization': `Bearer ${localStorage.getItem('jwt')}` } });
-            const data = await res.json();
-            alert(data.message || data.error);
-        }
-
+        // --- CHARTS & TELEMETRY ---
         function initCharts() {
             const opt = { rotation: 270, circumference: 180, cutout: '75%', plugins: { tooltip: { enabled: false } }, animation: { duration: 0 } };
             cpuChartInstance = new Chart(document.getElementById('cpuChart'), { type: 'doughnut', data: { datasets: [{ data: [0, 100], backgroundColor: ['#ef4444', '#f3f4f6'], borderWidth: 0 }] }, options: opt });
@@ -355,7 +371,6 @@
 
         function fetchAdminData() {
             const headers = { 'Authorization': `Bearer ${localStorage.getItem('jwt')}` };
-            
             fetch(`${baseUrl}/actuator/metrics/process.cpu.usage`, { headers }).then(r => r.json()).then(d => {
                 let cpu = d.measurements ? (d.measurements[0].value * 100).toFixed(1) : 0;
                 document.getElementById('cpuLabel').innerText = `${cpu}%`;
